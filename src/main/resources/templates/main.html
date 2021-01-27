@@ -5,6 +5,23 @@
     <title>Title</title>
 </head>
 <body>
-<p th:text="${some} + '!'" />
+    <div>
+        <form method="post">
+            <input type="text" name="text" placeholder="Введите сообщение"/>
+            <input type="text" name="tag" placeholder="Тэг"/>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+    <div><h3>Список сообщений </h3><br>
+        <form method="post" action="/filter">
+            <input type="text" name="filter"/>
+            <button type="submit">Найти</button>
+        </form>
+    </div>
+    <div th:each="msg : ${messages}" >
+            <b><span th:text="${msg.id}"></span></b><br>
+            <span th:text="${msg.text}"></span><br>
+            <i><span th:text="${msg.tag}"></span></i>
+    </div><br>
 </body>
 </html>
