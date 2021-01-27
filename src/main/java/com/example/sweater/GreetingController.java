@@ -1,12 +1,14 @@
 package com.example.sweater;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.Map;
 
+/**
+ * Пробуем <b>сделать</b> реальный проект и напихать потом в него всяких фич
+ * @author Roman
+ */
 @Controller
 public class GreetingController {
     @GetMapping("/greeting")
