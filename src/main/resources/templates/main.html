@@ -24,9 +24,10 @@
         </form>
     </div>
     <div th:each="msg : ${messages}" >
-            <b><span th:text="${msg.id}"></span></b><br>
-            <span th:text="${msg.text}"></span><br>
-            <i><span th:text="${msg.tag}"></span></i>
+            <b><span th:text="${msg.id}"  ></span></b>
+            <span th:text="${msg.text}"  ></span>
+            <i><span th:text="${msg.tag}"  ></span></i>
+            <strong><span th:text="${msg.author.username}"></span></strong>
     </div><br>
 </body>
 </html>
