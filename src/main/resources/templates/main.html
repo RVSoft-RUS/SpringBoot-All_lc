@@ -6,7 +6,12 @@
 </head>
 <body>
     <div>
-        <form method="post">
+        <form action="/logout" method="post">
+            <input type="submit" value="Log out">
+        </form>
+    </div>
+    <div>
+        <form method="post" action="main">
             <input type="text" name="text" placeholder="Введите сообщение"/>
             <input type="text" name="tag" placeholder="Тэг"/>
             <button type="submit">Добавить</button>
