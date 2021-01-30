@@ -18,19 +18,17 @@ public class RegistrationController {
     @Autowired
     private UserRepo userRepo;
 
-    @GetMapping("/registration")
+    @GetMapping("/reg")
     public String registration() {
-        return "registration";
+        return "reg";
     }
 
-    @PostMapping("/registration")
-    public String addUser(User user, Map<String, Object> model) {
+    @PostMapping("/reg")
+    public String addUser(User user, Map<String, String> model) {
         User userFromDb = userRepo.findByUsername(user.getUsername());
         if (userFromDb != null) {
-            List<String> messages = new ArrayList<>();
-            messages.add("User exists!");
-            model.put("messages", messages);
-            return "registration";
+            model.put("message", "User exists!");
+            return "reg";
         }
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
