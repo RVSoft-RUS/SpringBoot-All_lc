@@ -1,44 +1,65 @@
 package com.example.sweater.controller;
 
 import com.example.sweater.domain.Message;
+import com.example.sweater.domain.Role;
 import com.example.sweater.domain.User;
 import com.example.sweater.repos.MessageRepo;
+import com.example.sweater.repos.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Пробуем <b>сделать</b> реальный проект и напихать потом в него всяких фич
- * @author Roman
- */
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
+
 @Controller
 public class MainController {
-    private final MessageRepo messageRepo;
+    private boolean isFirstTime = true;
+    @Autowired
+    private MessageRepo messageRepo;
+    @Autowired
+    private UserRepo userRepo;
 
-    public MainController(MessageRepo messageRepo) {
-        this.messageRepo = messageRepo;
-    }
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @GetMapping("/")
     public String greeting(Map<String, Object> model) {
-//        model.put("name", name);
+        if (isFirstTime) {
+            User user = new User();
+            user.setUsername("admin");
+            user.setPassword("admin");
+            user.setActive(true);
+            user.setRoles(Collections.singleton(Role.ADMIN));
+            userRepo.save(user);
+            isFirstTime = false;
+        }
+
         return "greeting";
     }
 
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
-        Iterable<Message> messages;
+        Iterable<Message> messages = messageRepo.findAll();
+
         if (filter != null && !filter.isEmpty()) {
             messages = messageRepo.findByTag(filter);
         } else {
             messages = messageRepo.findAll();
         }
+
         model.addAttribute("messages", messages);
         model.addAttribute("filter", filter);
+
         return "main";
     }
 
@@ -46,13 +67,32 @@ public class MainController {
     public String add(
             @AuthenticationPrincipal User user,
             @RequestParam String text,
-            @RequestParam String tag, Map<String, Object> model
-    ) {
+            @RequestParam String tag, Map<String, Object> model,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
         Message message = new Message(text, tag, user);
+
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFilename = uuidFile + "." + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/" + resultFilename));
+
+            message.setFilename(resultFilename);
+        }
+
         messageRepo.save(message);
 
         Iterable<Message> messages = messageRepo.findAll();
+
         model.put("messages", messages);
+
         return "main";
     }
 }
